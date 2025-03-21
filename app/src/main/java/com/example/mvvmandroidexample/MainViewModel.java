@@ -13,7 +13,7 @@ public class MainViewModel extends ViewModel {
     public LiveData<Integer> getRandomNumber() {
         return randomNumber;
     }
-
+    //
     public void generateNewRandomNumber() {
         randomNumber.setValue(random.nextInt(100));
     }
