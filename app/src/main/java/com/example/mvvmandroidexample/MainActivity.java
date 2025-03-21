@@ -10,12 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import java.util.Random;
+import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends AppCompatActivity {
     private TextView tvRandomNumber;
-    private Random random;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,26 +22,30 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        
         // Initialize views
         Button btnRandom = findViewById(R.id.btnRandom);
         Button btnNavigate = findViewById(R.id.btnNavigate);
         tvRandomNumber = findViewById(R.id.tvRandomNumber);
-        random = new Random();
 
         // Set up click listeners
-        btnRandom.setOnClickListener(v -> generateRandomNumber());
+        btnRandom.setOnClickListener(v -> viewModel.generateNewRandomNumber());
         btnNavigate.setOnClickListener(v -> navigateToSecondActivity());
+
+        // Observe random number changes
+        viewModel.getRandomNumber().observe(this, number -> {
+            if (number != null) {
+                tvRandomNumber.setText(String.valueOf(number));
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-    }
-
-    private void generateRandomNumber() {
-        int randomNumber = random.nextInt(100); // Generates a random number between 0 and 99
-        tvRandomNumber.setText(String.valueOf(randomNumber));
     }
 
     private void navigateToSecondActivity() {
