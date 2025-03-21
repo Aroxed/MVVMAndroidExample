@@ -13,9 +13,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private static final String KEY_NUMBER_HISTORY = "number_history";
     private TextView tvRandomNumber;
+    private TextView tvHistory;
     private MainViewModel viewModel;
 
     @Override
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnRandom = findViewById(R.id.btnRandom);
         Button btnNavigate = findViewById(R.id.btnNavigate);
         tvRandomNumber = findViewById(R.id.tvRandomNumber);
+        tvHistory = findViewById(R.id.tvHistory);
 
         // Set up click listeners
         btnRandom.setOnClickListener(v -> viewModel.generateNewRandomNumber());
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getRandomNumber().observe(this, number -> {
             if (number != null) {
                 tvRandomNumber.setText(String.valueOf(number));
+                updateHistoryDisplay();
             }
         });
 
@@ -85,12 +92,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState: Saving activity state");
+        ArrayList<Integer> history = new ArrayList<>(viewModel.getNumberHistory());
+        outState.putIntegerArrayList(KEY_NUMBER_HISTORY, history);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d(TAG, "onRestoreInstanceState: Restoring activity state");
+        ArrayList<Integer> history = savedInstanceState.getIntegerArrayList(KEY_NUMBER_HISTORY);
+        if (history != null) {
+            viewModel.setNumberHistory(history);
+            updateHistoryDisplay();
+        }
+    }
+
+    private void updateHistoryDisplay() {
+        List<Integer> history = viewModel.getNumberHistory();
+        StringBuilder sb = new StringBuilder("History:\n");
+        for (int i = 0; i < history.size(); i++) {
+            sb.append(i + 1).append(". ").append(history.get(i)).append("\n");
+        }
+        tvHistory.setText(sb.toString());
     }
 
     private void navigateToSecondActivity() {

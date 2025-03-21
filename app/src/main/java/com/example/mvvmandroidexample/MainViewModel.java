@@ -4,17 +4,31 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MainViewModel extends ViewModel {
     private final Random random = new Random();
     private final MutableLiveData<Integer> randomNumber = new MutableLiveData<>();
+    private final List<Integer> numberHistory = new ArrayList<>();
 
     public LiveData<Integer> getRandomNumber() {
         return randomNumber;
     }
 
+    public List<Integer> getNumberHistory() {
+        return numberHistory;
+    }
+
     public void generateNewRandomNumber() {
-        randomNumber.setValue(random.nextInt(100));
+        int newNumber = random.nextInt(100);
+        randomNumber.setValue(newNumber);
+        numberHistory.add(newNumber);
+    }
+
+    public void setNumberHistory(List<Integer> history) {
+        numberHistory.clear();
+        numberHistory.addAll(history);
     }
 } 
