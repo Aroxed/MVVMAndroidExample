@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: Activity is in foreground and interactive");
+        updateHistoryDisplay();
     }
 
     @Override

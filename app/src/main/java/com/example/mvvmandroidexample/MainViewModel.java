@@ -23,8 +23,8 @@ public class MainViewModel extends ViewModel {
 
     public void generateNewRandomNumber() {
         int newNumber = random.nextInt(100);
-        randomNumber.setValue(newNumber);
         numberHistory.add(newNumber);
+        randomNumber.setValue(newNumber);
     }
 
     public void setNumberHistory(List<Integer> history) {
