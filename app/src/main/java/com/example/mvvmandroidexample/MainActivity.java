@@ -47,9 +47,9 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getRandomNumber().observe(this, number -> {
             if (number != null) {
                 tvRandomNumber.setText(String.valueOf(number));
-                updateHistoryDisplay();
             }
         });
+        viewModel.getNumberHistory().observe(this, this::updateHistoryDisplay);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: Activity is in foreground and interactive");
-        updateHistoryDisplay();
     }
 
     @Override
@@ -93,8 +92,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState: Saving activity state");
-        ArrayList<Integer> history = new ArrayList<>(viewModel.getNumberHistory());
-        outState.putIntegerArrayList(KEY_NUMBER_HISTORY, history);
+        List<Integer> history = viewModel.getNumberHistory().getValue();
+        if (history != null) {
+            outState.putIntegerArrayList(KEY_NUMBER_HISTORY, new ArrayList<>(history));
+        }
     }
 
     @Override
@@ -104,15 +105,15 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Integer> history = savedInstanceState.getIntegerArrayList(KEY_NUMBER_HISTORY);
         if (history != null) {
             viewModel.setNumberHistory(history);
-            updateHistoryDisplay();
         }
     }
 
-    private void updateHistoryDisplay() {
-        List<Integer> history = viewModel.getNumberHistory();
+    private void updateHistoryDisplay(List<Integer> history) {
         StringBuilder sb = new StringBuilder("History:\n");
-        for (int i = 0; i < history.size(); i++) {
-            sb.append(i + 1).append(". ").append(history.get(i)).append("\n");
+        if (history != null) {
+            for (int i = 0; i < history.size(); i++) {
+                sb.append(i + 1).append(". ").append(history.get(i)).append("\n");
+            }
         }
         tvHistory.setText(sb.toString());
     }
